@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+if [[ "$(docker images -q yuneec-sitl:7 2> /dev/null)" == "" ]]; then
+  # Build image
+  docker build -f Dockerfile-ubuntu16.04cudagl10 -t yuneec-sitl:7 .
+fi
+
+docker run -it \
+           --gpus all \
+           --env "DISPLAY" \
+           --env "QT_X11_NO_MITSHM=1" \
+           --rm \
+           --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw \
+           yuneec-sitl:7
