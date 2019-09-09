@@ -9,8 +9,7 @@ RUN echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable xenial main
 RUN wget https://d3qzlqwby7grio.cloudfront.net/H520/sitl/Linux/Yuneec-SITL-Simulation-Linux.zip -P /tmp/ && \
     mkdir -p /home/xuser/yuneec && \
     unzip /tmp/Yuneec-SITL-Simulation-Linux.zip -d /home/xuser/yuneec/ && \
-    mkdir /home/xuser/yuneec/posix-configs/SITL/init/ekf2 && \
-    cp /home/xuser/yuneec/posix-configs/SITL/init/default/typhoon_h480 /home/xuser/yuneec/posix-configs/SITL/init/ekf2/typhoon_h480 && \
+    ln -s /home/xuser/yuneec/posix-configs/SITL/init/default /home/xuser/yuneec/posix-configs/SITL/init/ekf2 && \
     chown -R xuser:xuser /home/xuser && \
     rm  /tmp/Yuneec-SITL-Simulation-Linux.zip && \
     rm -rf /var/lib/apt/lists/*
