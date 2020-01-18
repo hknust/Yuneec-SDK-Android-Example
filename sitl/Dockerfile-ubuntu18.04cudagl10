@@ -1,0 +1,24 @@
+FROM nvidia/cudagl:10.0-runtime-ubuntu18.04
+
+RUN echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable bionic main" > /etc/apt/sources.list.d/gazebo-stable.list && \
+    apt-key adv --fetch-keys http://packages.osrfoundation.org/gazebo.key && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y apt-utils unzip wget gazebo9 libgazebo9-dev && \
+    useradd xuser
+
+RUN wget https://d3qzlqwby7grio.cloudfront.net/H520/sitl/Linux/Yuneec-SITL-Simulation-Linux.zip -P /tmp/ && \
+    mkdir -p /home/xuser/yuneec && \
+    unzip /tmp/Yuneec-SITL-Simulation-Linux.zip -d /home/xuser/yuneec/ && \
+    mkdir /home/xuser/yuneec/posix-configs/SITL/init/ekf2 && \
+    cp /home/xuser/yuneec/posix-configs/SITL/init/default/typhoon_h480 /home/xuser/yuneec/posix-configs/SITL/init/ekf2/typhoon_h480 && \
+    chown -R xuser:xuser /home/xuser && \
+    rm  /tmp/Yuneec-SITL-Simulation-Linux.zip && \
+    rm -rf /var/lib/apt/lists/*
+
+EXPOSE 14540
+EXPOSE 14550
+
+USER xuser
+
+WORKDIR /home/xuser/yuneec
+CMD /home/xuser/yuneec/typhoon_sitl.bash
