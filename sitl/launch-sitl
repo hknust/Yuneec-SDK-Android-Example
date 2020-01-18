@@ -1,8 +1,44 @@
 #!/usr/bin/env bash
 
-if [[ "$(docker images -q yuneec-sitl:7 2> /dev/null)" == "" ]]; then
+release=7
+
+function usage() {
+  echo "USAGE: $0 [-h|--help] [<gazebo version> (default: 7)]"
+  exit 0
+}
+
+PARAMS=""
+while (( "$#" )); do
+  case "$1" in
+    -h|--help) # print usage
+      usage
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*=) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
+
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
+
+if [ "$#" -gt 0 ]; then
+    release=$1
+fi
+
+if [[ "$(docker images -q yuneec-sitl:$release 2> /dev/null)" == "" ]]; then
   # Build image
-  docker build -f Dockerfile-ubuntu16.04cudagl10 -t yuneec-sitl:7 .
+  echo "SITL image for Gazebo rel. $release does not exist. Building now..."
+  docker build --build-arg gazebo_release=$release -f Dockerfile-xenial-gazebo-cudagl10 -t yuneec-sitl:$release .
 fi
 
 docker run -it \
@@ -11,4 +47,4 @@ docker run -it \
            --env "QT_X11_NO_MITSHM=1" \
            --rm \
            --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw \
-           yuneec-sitl:7
+           yuneec-sitl:$release
